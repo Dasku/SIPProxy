@@ -1,10 +1,13 @@
+from concurrent import futures
+
 import grpc
-import siprec
+
+from . import siprec
 
 class SIPRECToGRPCService(siprec.SIPRECServiceServicer):
 
     def __init__(self):
-        self.dialogflow_client = dialogflow.AgentsClient()
+        pass
 
     def StartStream(self, request, context):
         # Receive the SIPREC audio feed.
@@ -18,3 +21,14 @@ class SIPRECToGRPCService(siprec.SIPRECServiceServicer):
 
         # Return the Dialogflow response.
         return dialogflow_response
+
+def serve():
+    server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
+    siprec_to_grpc_service = SIPRECToGRPCService()
+    siprec.add_SIPRECServiceServicer_to_server(siprec_to_grpc_service, server)
+    server.add_insecure_port('[::]:50051')
+    server.start()
+    server.wait_for_termination()
+
+if __name__ == '__main__':
+    serve()
