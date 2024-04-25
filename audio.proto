@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package audio;
+
+// The audio message that will be streamed.
+message AudioChunk {
+    bytes data = 1;
+}
+
+// The response from the server after streaming the audio.
+message StreamAudioResponse {
+    string message = 1;
+}
+
+// The audio service definition.
+service AudioService {
+    rpc StreamAudio (stream AudioChunk) returns (StreamAudioResponse);
+}
